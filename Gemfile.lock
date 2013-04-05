@@ -1,0 +1,22 @@
+GIT
+  remote: git://github.com/SKoschnicke/mtgox.git
+  revision: bf8f1220cccb8c78754bfebe433495fae49044bb
+  branch: master
+  specs:
+    mtgox (0.8.2)
+      faraday (~> 0.8, < 0.10)
+      multi_json (~> 1.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    faraday (0.8.7)
+      multipart-post (~> 1.1)
+    multi_json (1.7.2)
+    multipart-post (1.2.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  mtgox!

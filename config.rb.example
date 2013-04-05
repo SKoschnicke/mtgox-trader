@@ -1,0 +1,4 @@
+MtGox.configure do |config|
+  config.key = YOUR_MTGOX_KEY
+  config.secret = YOUR_MTGOX_SECRET
+end
