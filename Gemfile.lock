@@ -1,9 +1,9 @@
 GIT
-  remote: git://github.com/SKoschnicke/mtgox.git
-  revision: bf8f1220cccb8c78754bfebe433495fae49044bb
+  remote: git://github.com/sferik/mtgox.git
+  revision: fe3957882a7ad8371fcbb890ead8f6216ae6c9c6
   branch: master
   specs:
-    mtgox (0.8.2)
+    mtgox (0.9.0)
       faraday (~> 0.8, < 0.10)
       multi_json (~> 1.0)
 

@@ -2,9 +2,10 @@ require 'rubygems'
 require 'mtgox'
 
 require './config.rb'
+STDOUT.sync = true
 
-spread = 2.0 # there must be two dollar difference to take action
-next_action = {:action => :buy, :price => MtGox.ticker.buy}
+spread = ARGV[0].to_f # there must be two dollar difference to take action
+next_action = {:action => :buy, :price => MtGox.ticker.buy, :last_fee => 0.0}
 
 start_money = 14.0
 fee = 0.006
@@ -13,28 +14,32 @@ money = start_money
 btc = 0.0
 
 while true do
-  ticker = MtGox.ticker
-  if next_action[:action] == :buy and ticker.buy <= next_action[:price]
-    puts "buying for #{ticker.buy}"
-    btc = (money - (money*fee)) / ticker.buy
-    money = 0.0
-    next_action = {:action => :sell, :price => ticker.buy + spread}
-    puts "next target is selling for #{next_action[:price]}"
-  elsif next_action[:action] == :sell and ticker.sell >= next_action[:price]
-    puts "selling for #{ticker.sell}"
-    money = (btc - (btc * fee)) * ticker.sell
-    btc = 0.0
-    next_action = {:action => :buy, :price => ticker.sell - spread}
-    puts "next target is buying for #{next_action[:price]}"
-  end
+  begin
+      ticker = MtGox.ticker
+      if next_action[:action] == :buy and ticker.buy <= next_action[:price] - next_action[:last_fee]
+        puts "buying for #{ticker.buy}"
+        btc = (money - (money*fee)) / ticker.buy
+        next_action = {:action => :sell, :price => ticker.buy + spread, :last_fee => money * fee / btc}
+        money = 0.0
+        puts "next target is selling for #{next_action[:price] + next_action[:last_fee]}"
+      elsif next_action[:action] == :sell and ticker.sell >= next_action[:price] + next_action[:last_fee]
+        puts "selling for #{ticker.sell}"
+        money = (btc - (btc * fee)) * ticker.sell
+        next_action = {:action => :buy, :price => ticker.sell - spread, :last_fee => btc * fee / money}
+        btc = 0.0
+        puts "next target is buying for #{next_action[:price] - next_action[:last_fee]}"
+      end
 
-  if next_action[:action] == :buy
-    puts "buy price is #{ticker.buy}"
-  else
-    puts "sell price is #{ticker.sell}"
+      if next_action[:action] == :buy
+        puts "buy price is #{ticker.buy}"
+      else
+        puts "sell price is #{ticker.sell}"
+      end
+      puts "Balance: #{btc} BTC, #{money} USD, #{(money + (btc*ticker.sell) - start_money)/start_money * 100.0}%"
+      sleep 10
+  rescue
+      puts "got exception"
   end
-  puts "Balance: #{btc} BTC, #{money} USD, #{(money + (btc*ticker.sell) - start_money)/start_money * 100.0}%"
-  sleep 10
 end
 
 =begin
